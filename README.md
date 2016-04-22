@@ -72,7 +72,6 @@ At the bottom of the file:
       // The callback to fire when a selection is made
       // Values passed:
       //    {Object} variant The variant object
-      //    {Object} selector The selector object (SingleOptionSelectorCustom)
       //    {Object} e The mouse event which fired the click
       callback: variant_callback
     });
