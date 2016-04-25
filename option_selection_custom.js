@@ -43,7 +43,19 @@ Shopify.OptionSelectorsCustom.prototype.updateSelectors = function(e) {
 
   // Select the variant ID from the original dropdown
   this.elem.value = variant.id;
-  this.elem.dispatchEvent(new Event('change'));
+  
+  var event;
+  if (/Edge\/|Trident\/|MSIE /.test(window.navigator.userAgent)) {
+    // IE
+    event = document.createEvent('Event');
+    event.initEvent('change', false, true); 
+  } else {
+    // Normal browsers
+    event = new Event('change');
+  }
+  
+  // Dispatch the change event
+  this.elem.dispatchEvent(event);
 
   // Update history if enabled
   if (this.history) {
