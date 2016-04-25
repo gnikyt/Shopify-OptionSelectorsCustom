@@ -67,7 +67,7 @@ At the bottom of the file:
       template: $('#option_selector_template').html(),
 
       // The class to set active when a customer clicks an item
-      selected_class: 'active',
+      selectedClass: 'active',
 
       // The callback to fire when a selection is made
       // Values passed:

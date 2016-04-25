@@ -104,7 +104,7 @@ Shopify.OptionSelectorsCustom.prototype.buildSelectors = function() {
         values: this.product.optionValues(i)
       },
       template: this.template,
-      selected_class: this.data.selected_class,
+      selectedClass: this.data.selectedClass,
       product: this.product
     });
     
@@ -184,7 +184,7 @@ Shopify.SingleOptionSelectorCustom = function(data) {
   this.values         = data.option.values;
   this.id             = data.option.id;
   this.template       = data.template;
-  this.selected_class = data.selected_class;
+  this.selectedClass = data.selectedClass;
   this.product        = data.product;
 };
 
@@ -208,17 +208,17 @@ Shopify.SingleOptionSelectorCustom.prototype.element = function() {
  * @returns {Object} The current selected object
  */
 Shopify.SingleOptionSelectorCustom.prototype.currentSelection = function() {
-  return this.element().querySelector('.'+this.selected_class);
+  return this.element().querySelector('.'+this.selectedClass);
 };
 
 /**
  * Clears any selection
  */
 Shopify.SingleOptionSelectorCustom.prototype.clearSelection = function() {
-  var currentlySelected = this.element().querySelector('.'+this.selected_class);
+  var currentlySelected = this.element().querySelector('.'+this.selectedClass);
   if (currentlySelected) {
     // Regex replace the selected class to remove spaces (looks cleaner)
-    var regex = new RegExp('(?:^|\s)'+this.selected_class+'(?!\S)', 'gi');
+    var regex = new RegExp('(?:^|\s)'+this.selectedClass+'(?!\S)', 'gi');
     currentlySelected.className = currentlySelected.className.replace(regex, '');
   }
 };
@@ -232,7 +232,7 @@ Shopify.SingleOptionSelectorCustom.prototype.makeSelection = function(child) {
     child = this.element().children[child];
   }
   
-  child.className += this.selected_class;
+  child.className += this.selectedClass;
 };
 
 
