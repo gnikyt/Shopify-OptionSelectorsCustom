@@ -127,6 +127,8 @@ Shopify.OptionSelectorsCustom.prototype.selectInitials = function() {
     this.selectors[optionID].clearSelection();
     this.selectors[optionID].makeSelection(0);
   }
+  
+  this.updateSelectors();
 };
 
 /**
