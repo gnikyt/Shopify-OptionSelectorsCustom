@@ -14,13 +14,14 @@ The following steps are simply guidelines. Your process may differ if you use Gu
 
 ### Asset
 
-Download `option_selection_custom.js` in this repository and upload it to your `assets` folder. As well, be sure to grab a copy of [Handlebars](handlebarsjs.com) and add it to your `assets`.
+Download `option_selection_custom.js` in this repository and upload it to your `assets` folder. Optionally, you can download and include `handlebars_helpers.js` which includes some helper methods for your templates. Lastly, be sure to grab a copy of [Handlebars](handlebarsjs.com) and add it to your `assets`.
 
 ### theme.liquid
 
 ```html
 {% if template == 'product' %}
   {{ 'handlebars.js' | asset_url | script_tag }}
+  {{ 'handlebars_helpers.js' | asset_url | script_tag }}
   {{ 'option_selection.js' | shopify_asset_url | script_tag }}
   {{ 'option_selection_custom.js' | asset_url | script_tag }}
 {% endif %}
