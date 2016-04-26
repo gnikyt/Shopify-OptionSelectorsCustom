@@ -36,10 +36,10 @@ Shopify.OptionSelectorsCustom.prototype.hideOriginalSelector = function() {
  * @params {Object} selector The selector object
  * @params {Object} e The mouse event from clicking
  */
-Shopify.OptionSelectorsCustom.prototype.updateSelectors = function(e) {
+Shopify.OptionSelectorsCustom.prototype.updateSelectors = function(selector, e) {
   // Get the variant by grabbing the selected values for all selectors and fire callback
   var variant = this.product.getVariant(this.selectedValues());
-  this.callback(variant, e);
+  this.callback(variant, selector, e);
 
   // Select the variant ID from the original dropdown
   this.elem.value = variant.id;
