@@ -234,7 +234,7 @@ Shopify.SingleOptionSelectorCustom.prototype.makeSelection = function(child) {
     child = this.element().children[child];
   }
   
-  child.className += this.selectedClass;
+  child.className += ' ' + this.selectedClass;
 };
 
 
