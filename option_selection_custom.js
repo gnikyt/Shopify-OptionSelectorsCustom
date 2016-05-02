@@ -220,8 +220,14 @@ Shopify.SingleOptionSelectorCustom.prototype.clearSelection = function() {
   var currentlySelected = this.element().querySelector('.'+this.selectedClass);
   if (currentlySelected) {
     // Regex replace the selected class to remove spaces (looks cleaner)
-    var regex = new RegExp('(?:^|\s)'+this.selectedClass+'(?!\S)', 'gi');
-    currentlySelected.className = currentlySelected.className.replace(regex, '');
+    var regex   = new RegExp('(^|\\s)'+this.selectedClass+'(\\s|$)', 'gi');
+    var classes = currentlySelected.className.split(/\s+/g).length;
+    
+    for (var i = 0; i < classes; i++) {
+      currentlySelected.className = currentlySelected.className.replace(regex, ' ');
+    }
+    
+    currentlySelected.className = currentlySelected.className.trim();
   }
 };
 
@@ -234,7 +240,9 @@ Shopify.SingleOptionSelectorCustom.prototype.makeSelection = function(child) {
     child = this.element().children[child];
   }
   
-  child.className += ' ' + this.selectedClass;
+  var classes = child.className.split(/\s+/g);
+  classes.push(this.selectedClass);
+  child.className = classes.join(' ').replace(/^[\s]+/gi, '');
 };
 
 
