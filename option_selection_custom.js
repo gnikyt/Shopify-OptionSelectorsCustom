@@ -3,7 +3,7 @@
  * @constructor
  * @param {Object} data The options for this class
  */
-Shopify.OptionSelectorsCustom = function(data) {  
+Shopify.OptionSelectorsCustom = function(data) {
   this.data      = data;
   this.elem      = document.getElementById(this.data.element);
   this.template  = Handlebars.compile(this.data.template);
@@ -14,7 +14,7 @@ Shopify.OptionSelectorsCustom = function(data) {
 
   this.hideOriginalSelector();
   this.buildSelectors();
-  
+
   if (Shopify.urlParam('variant')) {
     this.selectFromParams();
   } else {
@@ -41,19 +41,24 @@ Shopify.OptionSelectorsCustom.prototype.updateSelectors = function(selector, e) 
   var variant = this.product.getVariant(this.selectedValues());
   this.callback(variant, selector, e);
 
+  if (variant == null) {
+    // No variant.. kill this
+    return;
+  }
+
   // Select the variant ID from the original dropdown
   this.elem.value = variant.id;
-  
+
   var event;
   if (/Edge\/|Trident\/|MSIE /.test(window.navigator.userAgent)) {
     // IE
     event = document.createEvent('Event');
-    event.initEvent('change', false, true); 
+    event.initEvent('change', false, true);
   } else {
     // Normal browsers
     event = new Event('change');
   }
-  
+
   // Dispatch the change event
   this.elem.dispatchEvent(event);
 
@@ -71,7 +76,7 @@ Shopify.OptionSelectorsCustom.prototype.createSelectorListener = function(item) 
   var self     = this;
   var selector = typeof item == 'string' ? this.selectors[item] : item;
   var children = selector.element().children;
-  
+
   /**
    * Closure callback for click event
    * @param {Object} e The mouse event from clicking
@@ -82,7 +87,7 @@ Shopify.OptionSelectorsCustom.prototype.createSelectorListener = function(item) 
     selector.makeSelection(this);
     self.updateSelectors(selector, e);
   };
-  
+
   // Loop all children of selector and add click event to them
   for (var i = 0; i < children.length; i++) {
     children[i].addEventListener('click', clickCallback);
@@ -107,7 +112,7 @@ Shopify.OptionSelectorsCustom.prototype.buildSelectors = function() {
       selectedClass: this.data.selectedClass,
       product: this.product
     });
-    
+
     /*
     * Add the selector to our registry,
     * Inject it's markup into the document,
@@ -127,7 +132,7 @@ Shopify.OptionSelectorsCustom.prototype.selectInitials = function() {
     this.selectors[optionID].clearSelection();
     this.selectors[optionID].makeSelection(0);
   }
-  
+
   this.updateSelectors();
 };
 
@@ -144,7 +149,7 @@ Shopify.OptionSelectorsCustom.prototype.selectedValues = function() {
       selected.push(selection.getAttribute('data-value'));
     }
   }
-  
+
   return selected;
 };
 
@@ -156,12 +161,12 @@ Shopify.OptionSelectorsCustom.prototype.selectFromParams = function() {
   if (id) {
     // Get the variant by ID
     var variant = this.product.getVariantById(id);
-    
+
     // Loop over the options to find matches
     for (var i = 0; i < variant.options.length; i++) {
       var selector = this.selectors['product_option'+(i + 1)];
       var children = selector.element().children;
-      
+
       for (var x = 0; x < children.length; x++) {
         if (children[x].getAttribute('data-value') == variant.options[i]) {
           // Found, make the selection
@@ -169,7 +174,7 @@ Shopify.OptionSelectorsCustom.prototype.selectFromParams = function() {
         }
       }
     }
-    
+
     // Update the selectors (callbacks, etc)
     this.updateSelectors();
   }
@@ -219,15 +224,15 @@ Shopify.SingleOptionSelectorCustom.prototype.currentSelection = function() {
 Shopify.SingleOptionSelectorCustom.prototype.clearSelection = function() {
   var currentlySelected = this.element().querySelector('.'+this.selectedClass);
   if (currentlySelected) {
-    var classes = currentlySelected.className.split(/\s+/g);
-    for (var i = 0; i < classes.length; i++) {
-      if (classes[i] == this.selectedClass) {
-        classes.splice(i, 1);
-        i--;
-      }
+    // Regex replace the selected class to remove spaces (looks cleaner)
+    var regex   = new RegExp('(^|\\s)'+this.selectedClass+'(\\s|$)', 'gi');
+    var classes = currentlySelected.className.split(/\s+/g).length;
+
+    for (var i = 0; i < classes; i++) {
+      currentlySelected.className = currentlySelected.className.replace(regex, ' ');
     }
-    
-    currentlySelected.className = classes.join(' ').trim();
+
+    currentlySelected.className = currentlySelected.className.trim();
   }
 };
 
@@ -239,7 +244,7 @@ Shopify.SingleOptionSelectorCustom.prototype.makeSelection = function(child) {
   if (typeof child == 'number') {
     child = this.element().children[child];
   }
-  
+
   var classes = child.className.split(/\s+/g);
   classes.push(this.selectedClass);
   child.className = classes.join(' ').replace(/^[\s]+/gi, '');
