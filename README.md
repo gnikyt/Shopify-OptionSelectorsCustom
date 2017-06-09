@@ -14,7 +14,7 @@ The following steps are simply guidelines. Your process may differ if you use Gu
 
 ### Asset
 
-Download `option_selection_custom.js` in this repository and upload it to your `assets` folder. Optionally, you can download and include `handlebars_helpers.js` which includes some helper methods for your templates. Lastly, be sure to grab a copy of [Handlebars](handlebarsjs.com) and add it to your `assets`.
+Download `option-selection-custom.js` in this repository and upload it to your `assets` folder. Optionally, you can download and include `handlebars-helpers.js` which includes some helper methods for your templates. Lastly, be sure to grab a copy of [Handlebars](handlebarsjs.com) and add it to your `assets`.
 
 ### theme.liquid
 
@@ -29,7 +29,7 @@ Download `option_selection_custom.js` in this repository and upload it to your `
 
 ### product.liquid
 
-Ensure you have Liquid generating a dropdown box of all variants for you:
+Ensure you have Liquid generating a dropdown box of all variants, example:
 
 ```html
 <select id="product-select" name="id">
@@ -44,14 +44,14 @@ Ensure you have Liquid generating a dropdown box of all variants for you:
 At the bottom of the file:
 
 ```html
-{% include 'option_selector_template' %}
+{% include 'option-selector-template' %}
 
 <script>
   jQuery(document).ready(function($) {
-    var variant_callback = function(variant, selector) {
+    var variantCallback = function(variant, selector) {
       // The variant selected by customer, you can do what you wish with the object
       // Update the price, change the images, etc
-      console.log(variant); 
+      console.log(variant);
     };
 
     new Shopify.OptionSelectorsCustom({
@@ -74,7 +74,7 @@ At the bottom of the file:
       // Values passed:
       //    {Object} variant The variant object
       //    {Object} e The mouse event which fired the click
-      callback: variant_callback
+      callback: variantCallback
     });
   });
 </script>
@@ -82,25 +82,24 @@ At the bottom of the file:
 
 Please note, for the object you pass into `Shopify.OptionSelectorsCustom`, all parameters are required besides `enableHistory`.
 
-### snippets/option_selector_template.liquid
+### snippets/option-selector-template.liquid
 
 This is the template which will be repeated for every option. You have full control of the markup with a small list of requirements:
 
 1. Ensure you use `{% raw %}` around the template so the Handlebar variables will not be parsed by Liquid
-2. `id="{{option_id}}"` is required on your parent container for the options
-3. The direct children of the parent must have `data-value="{{this}}"`
+2. `id="selector-{{product_id}}-{{option_id}}"` is required on your parent container for the options
+3. `.options` container is required, with all direct children being options.
+3. Options under `.options`, must have `data-value="{{this}}"`
 
 ```
 {% raw %}
-  <script id="option_selector_template" type="text/x-handlebars-template">
-    <div class="selectbox">
-      <h4 class="section-name">Choose a {{option_name}}</h4>
-      <div class="list">
-        <ul id="{{option_id}}">
-          {{#each option_values}}
-            <li data-value="{{this}}"><span>{{this}}</span></li> 
-          {{/each}}
-        </ul>
+  <script id="option-selector-template" type="text/x-handlebars-template">
+    <div id="selector-{{product_id}}-{{option_id}}" class="row selector" data-selectbox-name="{{option_name}}">
+      <div class="label">{{option_name}}</div>
+      <div class="options">
+        {{#each option_values}}
+          <span data-value="{{this}}" class="option"><span class="option-text">{{this}}</span></span>
+        {{/each}}
       </div>
     </div>
   </script>

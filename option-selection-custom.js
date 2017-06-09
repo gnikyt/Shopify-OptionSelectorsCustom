@@ -1,15 +1,15 @@
 /**
  * Creates an instance of OptionSelectorsCustom
  * @constructor
- * @param {Object} data The options for this class
+ * @param {Object} data - The options for this class
  */
 Shopify.OptionSelectorsCustom = function(data) {
-  this.data      = data;
-  this.elem      = document.getElementById(this.data.element);
-  this.template  = Handlebars.compile(this.data.template);
-  this.product   = new Shopify.Product(this.data.product);
-  this.callback  = this.data.callback;
-  this.history   = this.data.enableHistory && new Shopify.OptionSelectorsCustom.HistoryState(this);
+  this.data = data;
+  this.elem = document.getElementById(this.data.element);
+  this.template = Handlebars.compile(this.data.template);
+  this.product = new Shopify.Product(this.data.product);
+  this.callback = this.data.callback;
+  this.history = this.data.enableHistory && new Shopify.OptionSelectorsCustom.HistoryState(this);
   this.selectors = {};
 
   this.hideOriginalSelector();
@@ -32,9 +32,9 @@ Shopify.OptionSelectorsCustom.prototype.hideOriginalSelector = function() {
 /**
  * Handles updating the selectors
  * Fires the callback, fires change event, update shistory
- * @param {Object} variant The variant object
- * @params {Object} selector The selector object
- * @params {Object} e The mouse event from clicking
+ * @param {Object} variant - The variant object
+ * @param {Object} selector - The selector object
+ * @param {Object} e - The mouse event from clicking
  */
 Shopify.OptionSelectorsCustom.prototype.updateSelectors = function(selector, e) {
   // Get the variant by grabbing the selected values for all selectors and fire callback
@@ -70,16 +70,16 @@ Shopify.OptionSelectorsCustom.prototype.updateSelectors = function(selector, e) 
 
 /**
  * Creates a listener event for our custom selectors
- * @param {(object|string)} item The selector item to target
+ * @param {Object|String} item - The selector item to target
  */
 Shopify.OptionSelectorsCustom.prototype.createSelectorListener = function(item) {
-  var self     = this;
+  var self = this;
   var selector = typeof item == 'string' ? this.selectors[item] : item;
-  var children = selector.element().children;
+  var children = selector.element().querySelector('.options').children;
 
   /**
    * Closure callback for click event
-   * @param {Object} e The mouse event from clicking
+   * @param {Object} e - The mouse event from clicking
    */
   var clickCallback = function(e) {
     // Clear current selection for this selector and make new selection base on node
@@ -104,13 +104,13 @@ Shopify.OptionSelectorsCustom.prototype.buildSelectors = function() {
     // Create a new single option selector with data it needs
     var singleSelector = new Shopify.SingleOptionSelectorCustom({
       option: {
-        id: 'product_option'+(i + 1),
+        id: 'option' + (i + 1),
         name: optionNames[i],
         values: this.product.optionValues(i)
       },
       template: this.template,
       selectedClass: this.data.selectedClass,
-      product: this.product
+      product: this.product,
     });
 
     /*
@@ -128,17 +128,38 @@ Shopify.OptionSelectorsCustom.prototype.buildSelectors = function() {
  * Selects the first item in each selector
  */
 Shopify.OptionSelectorsCustom.prototype.selectInitials = function() {
-  for (var optionID in this.selectors) {
-    this.selectors[optionID].clearSelection();
-    this.selectors[optionID].makeSelection(0);
+  // Attempt to find the first available variant
+  var availableVariant = null;
+  var variants = this.product.variants;
+
+  for (var i = 0; i < variants.length; i++) {
+    if (variants[i].available) {
+      availableVariant = variants[i];
+      break;
+    }
   }
 
-  this.updateSelectors();
+  if (availableVariant) {
+    // Select based on variant ID
+    this.selectFromParams(availableVariant.id);
+  } else {
+    // Select the first options in each selector
+    for (var optionId in this.selectors) {
+      if (!this.selectors.hasOwnProperty(optionId)) {
+        continue;
+      }
+
+      this.selectors[optionId].clearSelection();
+      this.selectors[optionId].makeSelection(0);
+    }
+
+    this.updateSelectors();
+  }
 };
 
 /**
  * Grabs the selected values of all selectors
- * @returns {Array} the selected values
+ * @return {Array} the selected values
  */
 Shopify.OptionSelectorsCustom.prototype.selectedValues = function() {
   var selected = [];
@@ -155,17 +176,21 @@ Shopify.OptionSelectorsCustom.prototype.selectedValues = function() {
 
 /**
  * Selects options based on URL param
+* @param {Object|null} variantId - The variant ID to select (optional)
  */
-Shopify.OptionSelectorsCustom.prototype.selectFromParams = function() {
-  var id = Shopify.urlParam('variant');
+Shopify.OptionSelectorsCustom.prototype.selectFromParams = function(variantId) {
+  var id = variantId ? variantId : Shopify.urlParam('variant');
   if (id) {
     // Get the variant by ID
     var variant = this.product.getVariantById(id);
+    if (!variant) {
+      return;
+    }
 
     // Loop over the options to find matches
     for (var i = 0; i < variant.options.length; i++) {
-      var selector = this.selectors['product_option'+(i + 1)];
-      var children = selector.element().children;
+      var selector = this.selectors['option' + (i + 1)];
+      var children = selector.element().querySelector('.options').children;
 
       for (var x = 0; x < children.length; x++) {
         if (children[x].getAttribute('data-value') == variant.options[i]) {
@@ -180,52 +205,56 @@ Shopify.OptionSelectorsCustom.prototype.selectFromParams = function() {
   }
 };
 
-
 /**
  * Creates and instance of SingleOptionSelectorCustom
  * @constructor
- * @param {Object} data The options for this class
+ * @param {Object} data - The options for this class
  */
 Shopify.SingleOptionSelectorCustom = function(data) {
-  this.name           = data.option.name;
-  this.values         = data.option.values;
-  this.id             = data.option.id;
-  this.template       = data.template;
+  this.name = data.option.name;
+  this.values = data.option.values;
+  this.id = data.option.id;
+  this.template = data.template;
   this.selectedClass = data.selectedClass;
-  this.product        = data.product;
+  this.product = data.product;
 };
 
 /**
  * Builds the selector by compiling the Handlebar template
  */
 Shopify.SingleOptionSelectorCustom.prototype.buildSelector = function() {
-  return this.template({ option_id: this.id, option_name: this.name, option_values: this.values });
+  return this.template({
+    option_id: this.id,
+    option_name: this.name,
+    option_values: this.values,
+    product_id: this.product.id
+  });
 };
 
 /**
  * Returns the element object for this selector
- * @returns {Object} The element's object
+ * @return {Object} The element's object
  */
 Shopify.SingleOptionSelectorCustom.prototype.element = function() {
-  return document.getElementById(this.id);
+  return document.getElementById('selector-' + this.product.id + '-' + this.id);
 };
 
 /**
  * Grabs the current selection for this selector
- * @returns {Object} The current selected object
+ * @return {Object} The current selected object
  */
 Shopify.SingleOptionSelectorCustom.prototype.currentSelection = function() {
-  return this.element().querySelector('.'+this.selectedClass);
+  return this.element().querySelector('.' + this.selectedClass);
 };
 
 /**
  * Clears any selection
  */
 Shopify.SingleOptionSelectorCustom.prototype.clearSelection = function() {
-  var currentlySelected = this.element().querySelector('.'+this.selectedClass);
+  var currentlySelected = this.element().querySelector('.' + this.selectedClass);
   if (currentlySelected) {
     // Regex replace the selected class to remove spaces (looks cleaner)
-    var regex   = new RegExp('(^|\\s)'+this.selectedClass+'(\\s|$)', 'gi');
+    var regex = new RegExp('(^|\\s)' + this.selectedClass + '(\\s|$)', 'gi');
     var classes = currentlySelected.className.split(/\s+/g).length;
 
     for (var i = 0; i < classes; i++) {
@@ -238,11 +267,11 @@ Shopify.SingleOptionSelectorCustom.prototype.clearSelection = function() {
 
 /**
  * Make a selection
- * @param {(Object|Number)} The child to select
+ * @param {Object|Number} child - The child to select
 */
 Shopify.SingleOptionSelectorCustom.prototype.makeSelection = function(child) {
   if (typeof child == 'number') {
-    child = this.element().children[child];
+    child = this.element().querySelector('.options').children[child];
   }
 
   var classes = child.className.split(/\s+/g);
@@ -254,7 +283,7 @@ Shopify.SingleOptionSelectorCustom.prototype.makeSelection = function(child) {
 /**
  * Handles setting new variant in history and URL
  * @constructor
- * @parma {Object} klass The instance of OptionSelectorsCustom
+ * @param {Object} klass - The instance of OptionSelectorsCustom
  */
 Shopify.OptionSelectorsCustom.HistoryState = function(klass) {
   // Determins if history state is supported
@@ -263,7 +292,7 @@ Shopify.OptionSelectorsCustom.HistoryState = function(klass) {
 
 /**
  * Fires on selection of an option to set the new state
- * @param {Object} variant The variant object
+ * @param {Object} variant - The variant object
  */
 Shopify.OptionSelectorsCustom.HistoryState.prototype.onSelection = function(variant) {
   if (this.supported) {
