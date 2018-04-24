@@ -1,0 +1,17 @@
+{
+  "extends": "airbnb-base",
+  "plugins": [
+      "import"
+  ],
+  "env": {
+      "browser": true,
+      "node": true
+  },
+  "rules": {
+      "radix": 0,
+      "no-shadow": 0,
+      "no-shadow-restricted-names": 2,
+      "func-names": ["error", "never"],
+      "no-param-reassign": [2, { "props": false }]
+  }
+}

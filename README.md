@@ -14,7 +14,7 @@ The following steps are simply guidelines. Your process may differ if you use Gu
 
 ### Asset
 
-Download `option-selection-custom.js` in this repository and upload it to your `assets` folder. Optionally, you can download and include `handlebars-helpers.js` which includes some helper methods for your templates. Lastly, be sure to grab a copy of [Handlebars](handlebarsjs.com) and add it to your `assets`.
+Download `dist/option-selection-custom.min.js` in this repository and upload it to your `assets` folder. Optionally, you can download and include `extras/handlebars-helpers.js` which includes some helper methods for your templates. Lastly, be sure to grab a copy of [Handlebars](handlebarsjs.com) and add it to your `assets` (or include it via NPM in your build process).
 
 ### theme.liquid
 
