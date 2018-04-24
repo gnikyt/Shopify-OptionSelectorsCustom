@@ -1,7 +1,7 @@
 {
   "name": "shopify-option-selection-custom",
   "version": "1.0.0",
-  "description": "OptionSelector but with ability for custom markup through Handlebars.",
+  "description": "Custom option selectors implementation which supports templates.",
   "author": "Tyler King <tyler.n.king@gmail.com>",
   "license": "MIT",
   "devDependencies": {

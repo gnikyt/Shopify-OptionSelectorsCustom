@@ -1,5 +1,5 @@
 /**
- * Custom option selectors for window.Shopify.
+ * Custom option selectors implementation which supports templates.
  * @license MIT
  */
 
