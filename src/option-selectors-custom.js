@@ -12,8 +12,9 @@ class OptionSelectorsCustom {
    */
   constructor(data) {
     this.data = data;
-    this.elem = document.getElementById(this.data.element);
-    this.template = window.Handlebars.compile(this.data.template);
+    this.elem = document.querySelector(this.data.element);
+    this.template = this.data.template;
+    this.templateBuilder = this.data.templateBuilder;
     this.product = new window.Shopify.Product(this.data.product);
     this.callback = this.data.callback;
     this.history = this.data.enableHistory && new HistoryState();
@@ -48,7 +49,7 @@ class OptionSelectorsCustom {
   updateSelectors(selector, e) {
     // Get the variant by grabbing the selected values for all selectors and fire callback
     const variant = this.product.getVariant(this.selectedValues());
-    this.callback(variant, selector, e);
+    this.callback.call(this, variant, selector, e);
 
     if (variant == null) {
       // No variant.. kill this
@@ -121,6 +122,7 @@ class OptionSelectorsCustom {
           values: this.product.optionValues(i),
         },
         template: this.template,
+        templateBuilder: this.templateBuilder,
         selectedClass: this.data.selectedClass,
         product: this.product,
       });
@@ -227,21 +229,17 @@ class SingleOptionSelectorCustom {
     this.values = data.option.values;
     this.id = data.option.id;
     this.template = data.template;
+    this.templateBuilder = data.templateBuilder;
     this.selectedClass = data.selectedClass;
     this.product = data.product;
   }
 
   /**
-   * Builds the selector by compiling the Handlebar template.
+   * Builds the selector by compiling the template.
    * @returns {string} HTML for the selector
    */
   buildSelector() {
-    return this.template({
-      option_id: this.id,
-      option_name: this.name,
-      option_values: this.values,
-      product_id: this.product.id,
-    });
+    return this.templateBuilder.call(this);
   }
 
   /**
@@ -319,4 +317,3 @@ class HistoryState {
 }
 
 module.exports = OptionSelectorsCustom;
-

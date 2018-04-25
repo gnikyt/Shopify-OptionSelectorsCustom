@@ -6,7 +6,7 @@ Shopify provides a Javascript [option selection library](https://docs.shopify.co
 
 ## The Solution
 
-This library allows you to pass in a Handlebars template to use for the selection generation. This enables you to style or format your markup just as you see fit and let the library handle returning the selected variant. It is written in pure Javascript.
+This library allows you to pass in a template builder, such as Handlebars, to use for the selection generation. This enables you to style or format your markup just as you see fit and let the library handle returning the selected variant. It is written in pure Javascript.
 
 ## Installation & Usage
 
@@ -32,14 +32,13 @@ Download `dist/option-selectors-custom.min.js` in this repository and upload it 
 
 Optionally, you can download and include `extras/handlebars-helpers.js` which includes some helper methods for your templates.
 
-Lastly, be sure to grab a copy of [Handlebars](handlebarsjs.com) and add it to your `assets` folder.
+Lastly, be sure to grab a copy of [Handlebars](handlebarsjs.com) or similar, and add it to your `assets` folder.
 
 #### layouts/theme.liquid Example
 
 ```html
 {% if template == 'product' %}
   {{ 'handlebars.js' | asset_url | script_tag }}
-  {{ 'handlebars-helpers.js' | asset_url | script_tag }}
   {{ 'option_selection.js' | shopify_asset_url | script_tag }}
   {{ 'option-selectors-custom.min.js' | asset_url | script_tag }}
 {% endif %}
@@ -78,16 +77,13 @@ At the bottom of the file (or in a dedicated JS file):
 
     new Shopify.OptionSelectorsCustom({
       // The select box ID to target
-      element: 'product-select',
+      element: '#product-select',
 
       // The product's JSON
       product: {{ product | json }},
 
       // Turn on history event (updates history with variant selected and updates URL)
       enableHistory: true,
-
-      // The template's HTML
-      template: $('#option_selector_template').html(),
 
       // The class to set active when a customer clicks an item
       selectedClass: 'active',
@@ -97,6 +93,21 @@ At the bottom of the file (or in a dedicated JS file):
       //    {Object} variant The variant object
       //    {Object} e The mouse event which fired the click
       callback: variantCallback,
+
+      // The template's HTML (Handlebars example)
+      template: Handlebars.compile($('#option_selector_template').html()),
+
+      // The handler for building each selector (template specific, Handlebars example)
+      templateBuilder: function () {
+        // `this` is scoped to OptionSelectorsCustom
+        // Feel free to add in any data you need for your templates
+        return this.template({
+          option_id: this.id,
+          option_name: this.name,
+          option_values: this.values,
+          product_id: this.product.id,
+        });
+      }
     });
   });
 </script>
@@ -108,10 +119,10 @@ Please note, for the object you pass into `Shopify.OptionSelectorsCustom`, all p
 
 This is the template which will be repeated for every option. You have full control of the markup with a small list of requirements:
 
-1. Ensure you use `{% raw %}` around the template so the Handlebar variables will not be parsed by Liquid
+1. Ensure you use `{% raw %}` around the template so the template builder (in this case, Handlebars) and it's variables will not be parsed by Liquid
 2. `id="selector-{{product_id}}-{{option_id}}"` is required on your parent container for the options
-3. `.options` container is required, with all direct children being options.
-3. Options under `.options`, must have `data-value="{{this}}"`
+3. `[data-options]` container is required, with all direct children being options.
+3. Options under each child (example `span.option` below), must have `data-value="{{this}}"` where the value is equal to the title for the option.
 
 ```
 {% raw %}
