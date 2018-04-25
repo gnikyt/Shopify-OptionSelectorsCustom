@@ -318,6 +318,5 @@ class HistoryState {
   }
 }
 
-// Reassigning namespace for ease
-window.Shopify = window.Shopify || { };
-window.Shopify.OptionSelectorsCustom = OptionSelectorsCustom;
+module.exports = OptionSelectorsCustom;
+

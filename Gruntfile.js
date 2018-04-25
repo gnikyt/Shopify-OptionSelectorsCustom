@@ -6,10 +6,21 @@ module.exports = (grunt) => {
       options: {
         sourceMap: false,
         presets: ['es2015'],
+        plugins: [
+          [
+            'transform-es2015-modules-umd',
+            {
+              globals: {
+                'option-selector-custom': 'Shopify.OptionSelectorsCustom',
+              },
+              exactGlobals: true,
+            },
+          ],
+        ],
       },
       dist: {
         files: {
-          'dist/option-selection-custom.js': 'src/option-selection-custom.js',
+          'dist/option-selectors-custom.js': 'src/option-selectors-custom.js',
         },
       },
     },
@@ -21,7 +32,7 @@ module.exports = (grunt) => {
       },
       default: {
         files: {
-          'dist/option-selection-custom.min.js': 'dist/option-selection-custom.js',
+          'dist/option-selectors-custom.min.js': 'dist/option-selectors-custom.js',
         },
       },
     },

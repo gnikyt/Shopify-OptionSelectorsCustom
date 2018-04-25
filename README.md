@@ -1,10 +1,10 @@
-# Shopify Single Option Selector Custom
+# Shopify Option Selector Custom
 
-### The Problem
+## The Problem
 
 Shopify provides a Javascript [option selection library](https://docs.shopify.com/themes/customization/products/use-products-with-multiple-options) to build multiple dropdown boxes for a given product based on the options and variants. However, this product library only generates dropdown boxes and many clients wish to have a more styled dropdown or a totally different method (like a list of swatches).
 
-### The Solution
+## The Solution
 
 This library allows you to pass in a Handlebars template to use for the selection generation. This enables you to style or format your markup just as you see fit and let the library handle returning the selected variant. It is written in pure Javascript.
 
@@ -12,22 +12,44 @@ This library allows you to pass in a Handlebars template to use for the selectio
 
 The following steps are simply guidelines. Your process may differ if you use Gulp, Grunt, or others in your standard workflow.
 
-### Asset
+### NPM
 
-Download `dist/option-selection-custom.min.js` in this repository and upload it to your `assets` folder. Optionally, you can download and include `extras/handlebars-helpers.js` which includes some helper methods for your templates. Lastly, be sure to grab a copy of [Handlebars](handlebarsjs.com) and add it to your `assets` (or include it via NPM in your build process).
+`npm i shopify-option-selectors-custom`
 
-### theme.liquid
+Now you can do:
+
+`import OptionSelectorsCustom from 'shopify-option-selectors-custom';`
+
+or
+
+`const OptionSelectorsCustom = require('shopify-option-selectors-custom');`
+
+Note: Ensure to install Handlebars library as well.
+
+### Browser
+
+Download `dist/option-selectors-custom.min.js` in this repository and upload it to your `assets` folder.
+
+Optionally, you can download and include `extras/handlebars-helpers.js` which includes some helper methods for your templates.
+
+Lastly, be sure to grab a copy of [Handlebars](handlebarsjs.com) and add it to your `assets` folder.
+
+#### layouts/theme.liquid Example
 
 ```html
 {% if template == 'product' %}
   {{ 'handlebars.js' | asset_url | script_tag }}
-  {{ 'handlebars_helpers.js' | asset_url | script_tag }}
+  {{ 'handlebars-helpers.js' | asset_url | script_tag }}
   {{ 'option_selection.js' | shopify_asset_url | script_tag }}
-  {{ 'option_selection_custom.js' | asset_url | script_tag }}
+  {{ 'option-selectors-custom.min.js' | asset_url | script_tag }}
 {% endif %}
 ```
 
-### product.liquid
+## Usage in Theme
+
+Very basic outline of how to use it, you're free to use any other implementation.
+
+### templates/product.liquid
 
 Ensure you have Liquid generating a dropdown box of all variants, example:
 
@@ -41,7 +63,7 @@ Ensure you have Liquid generating a dropdown box of all variants, example:
 </select>
 ```
 
-At the bottom of the file:
+At the bottom of the file (or in a dedicated JS file):
 
 ```html
 {% include 'option-selector-template' %}
@@ -74,7 +96,7 @@ At the bottom of the file:
       // Values passed:
       //    {Object} variant The variant object
       //    {Object} e The mouse event which fired the click
-      callback: variantCallback
+      callback: variantCallback,
     });
   });
 </script>
