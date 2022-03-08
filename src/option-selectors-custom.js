@@ -23,7 +23,7 @@ class OptionSelectorsCustom {
     this.hideOriginalSelector();
     this.buildSelectors();
 
-    if (window.Shopify.urlParam('variant')) {
+    if (window.Shopify.urlParam('variant') && this.history) {
       this.selectFromParams();
     } else {
       this.selectInitials();
